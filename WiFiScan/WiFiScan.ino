@@ -7,11 +7,11 @@
 
 
 
+
 #include "FS.h"
 #include "SD.h"
 #include "SPI.h"
-#include <SPIFFS.h>
-
+#include "SPIFFS.h"
 #include <WebServer.h>
 WebServer server(80);
 
@@ -43,7 +43,7 @@ void setup(){
     Serial.begin(115200);
     EEPROM.begin(EEPROM_SIZE);
     
-    
+    SPI.begin(5);
    // clearEEPROM();
     
     SPIFFS.begin();
@@ -52,8 +52,6 @@ void setup(){
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
     delay(100);
-    
-    
     Serial.println("File Content:");
     
     File myFile = SPIFFS.open("/config.txt", FILE_READ);
@@ -116,7 +114,8 @@ void setup(){
       String conn = wifiConnect((char *) ssid.c_str(), (char *) password.c_str());
       if(conn=="1"){
         Serial.println(WiFi.localIP());
-        if(!SD.begin(5)){
+
+        if(!SD.begin()) {
           Serial.println("Card Mount Failed");
           return;
         }else{
