@@ -5,13 +5,14 @@
  */
 
 
+#define RXD2 16
+#define TXD2 17
 
+#include <FS.h>
+#include <SD.h>
+#include <SPI.h>
+#include <SPIFFS.h>
 
-
-#include "FS.h"
-#include "SD.h"
-#include "SPI.h"
-#include "SPIFFS.h"
 #include <WebServer.h>
 WebServer server(80);
 
@@ -42,8 +43,9 @@ File root, file;
 void setup(){
     Serial.begin(115200);
     EEPROM.begin(EEPROM_SIZE);
+    Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
     
-    SPI.begin(5);
+    
    // clearEEPROM();
     
     SPIFFS.begin();
@@ -52,6 +54,8 @@ void setup(){
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
     delay(100);
+    
+    
     Serial.println("File Content:");
     
     File myFile = SPIFFS.open("/config.txt", FILE_READ);
@@ -114,8 +118,7 @@ void setup(){
       String conn = wifiConnect((char *) ssid.c_str(), (char *) password.c_str());
       if(conn=="1"){
         Serial.println(WiFi.localIP());
-
-        if(!SD.begin()) {
+        if(!SD.begin(5)){
           Serial.println("Card Mount Failed");
           return;
         }else{
@@ -339,7 +342,7 @@ void setup(){
 
       
 
-      /*server.on("/bootstrap-input-spinner.js", []() {
+      server.on("/bootstrap-input-spinner.js", []() {
             File f = SPIFFS.open("/js/bootstrap-input-spinner.js", "r");
             server.streamFile(f, "text/javascript");
             int filesize = f.size();
@@ -361,7 +364,7 @@ void setup(){
               siz -= len; 
               f.close();
             } 
-      });*/
+      });
       
       server.on("/jquery.min.js", []() {
             File f = SPIFFS.open("/js/jquery.min.js", "r");
@@ -399,6 +402,7 @@ void sendCommand()
 {
  String cmd = server.arg("cmd");
  Serial.println(cmd);
+ Serial2.println(cmd);
  server.send(200, "text/plain", "1");
 }
 
@@ -407,6 +411,7 @@ void file_delete()
  
  String act_state = server.arg("fileName");
  Serial.println(act_state);
+ Serial2.println(act_state);
  deleteFile(SD, server.arg("fileName").c_str());
  server.send(200, "text/plain", "1");
 }
@@ -415,6 +420,7 @@ void file_read()
 {
    String act_state = server.arg("fileName");
    Serial.println(act_state);
+   Serial2.println(act_state);
    String result = readFile(SD, server.arg("fileName").c_str());
    server.send(200, "text/plain", result);
 }
@@ -518,6 +524,7 @@ void loop()
       // read the incoming string:
       String incomingString = Serial.readString();
       Serial.print(incomingString);
+      Serial2.print(incomingString);
       incomingString.trim();
       if(incomingString=="N" || incomingString=="n"){
         Serial.println(scanNetwork());
