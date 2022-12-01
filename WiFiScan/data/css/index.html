@@ -1,0 +1,1178 @@
+<html>
+
+<head>
+    <title>Neckog Industries</title>
+    <meta charset="UTF-8">
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <link href="all.min.css" rel="stylesheet">
+    -->
+    <script src="jquery.min.js"></script>
+    <script>
+        ! function(t) {
+            "use strict";
+            var e = function(t, e) {
+                    var n = t.locale || "en-US";
+                    this.parse = function(t) {
+                        var e = new Intl.NumberFormat(n),
+                            r = e.format(11111).replace(/1/g, "") || ".",
+                            o = e.format(1.1).replace(/1/g, "");
+                        return parseFloat(t.replace(new RegExp(" ", "g"), "").replace(new RegExp("\\" + r, "g"), "").replace(new RegExp("\\" + o), "."))
+                    }, this.render = function(t) {
+                        var r = parseInt(e.getAttribute("data-decimals")) || 0,
+                            o = !("false" === e.getAttribute("data-digit-grouping"));
+                        return new Intl.NumberFormat(n, {
+                            minimumFractionDigits: r,
+                            maximumFractionDigits: r,
+                            useGrouping: o
+                        }).format(t)
+                    }
+                },
+                n = !1,
+                r = t.fn.val;
+
+            function o(t, e) {
+                t.addEventListener("mousedown", function(t) {
+                    0 === t.button && (t.preventDefault(), e(t))
+                }), t.addEventListener("touchstart", function(t) {
+                    t.cancelable && t.preventDefault(), e(t)
+                }), t.addEventListener("keydown", function(t) {
+                    32 !== t.keyCode && 13 !== t.keyCode || n || (n = !0, e(t))
+                })
+            }
+            t.fn.val = function(t) {
+                if (arguments.length >= 1)
+                    for (var e = 0; e < this.length; e++) this[e]["bootstrap-input-spinner"] && this[e].setValue && this[e].setValue(t);
+                return r.apply(this, arguments)
+            }, t.fn.inputSpinner = function(r) {
+                if ("destroy" === r) return this.each(function() {
+                    this["bootstrap-input-spinner"] ? this.destroyInputSpinner() : console.warn("element", this, "is no bootstrap-input-spinner")
+                }), this;
+                var i = {
+                    decrementButton: "<strong>&minus;</strong>",
+                    incrementButton: "<strong>&plus;</strong>",
+                    groupClass: "",
+                    buttonsClass: "btn-outline-secondary",
+                    buttonsWidth: "2.5rem",
+                    textAlign: "center",
+                    autoDelay: 500,
+                    autoInterval: 50,
+                    buttonsOnly: !1,
+                    keyboardStepping: !0,
+                    locale: navigator.language,
+                    editor: e,
+                    template: '<div class="input-group ${groupClass}"><button style="min-width: ${buttonsWidth}" class="btn btn-decrement ${buttonsClass} btn-minus" type="button">${decrementButton}</button><input type="text" inputmode="decimal" style="text-align: ${textAlign}" class="form-control form-control-text-input"/><button style="min-width: ${buttonsWidth}" class="btn btn-increment ${buttonsClass} btn-plus" type="button">${incrementButton}</button></div>'
+                };
+                for (var a in r) i[a] = r[a];
+                var p = i.template.replace(/\${groupClass}/g, i.groupClass).replace(/\${buttonsWidth}/g, i.buttonsWidth).replace(/\${buttonsClass}/g, i.buttonsClass).replace(/\${decrementButton}/g, i.decrementButton).replace(/\${incrementButton}/g, i.incrementButton).replace(/\${textAlign}/g, i.textAlign);
+                return this.each(function() {
+                    if (this["bootstrap-input-spinner"]) console.warn("element", this, "is already a bootstrap-input-spinner");
+                    else {
+                        var e = t(this);
+                        e[0]["bootstrap-input-spinner"] = !0, e.hide(), e[0].inputSpinnerEditor = new i.editor(i, this);
+                        var r = null,
+                            a = null,
+                            u = t(p),
+                            s = u.find(".btn-decrement"),
+                            l = u.find(".btn-increment"),
+                            d = u.find("input"),
+                            c = t("label[for='" + e.attr("id") + "']");
+                        c[0] || (c = e.closest("label"));
+                        var f = null,
+                            m = null,
+                            b = null;
+                        D();
+                        var v = parseFloat(e[0].value),
+                            g = !1,
+                            h = e.attr("data-prefix") || "",
+                            y = e.attr("data-suffix") || "";
+                        if (h) {
+                            var w = t('<span class="input-group-text">' + h + "</span>");
+                            u.find("input").before(w)
+                        }
+                        if (y) {
+                            var x = t('<span class="input-group-text">' + y + "</span>");
+                            u.find("input").after(x)
+                        }
+                        e[0].setValue = function(t) {
+                            N(t)
+                        }, e[0].destroyInputSpinner = function() {
+                            e.prop("required", d.prop("required")), E.disconnect(), B(), d.off("paste input change focusout"), u.remove(), e.show(), e[0]["bootstrap-input-spinner"] = void 0, c[0] && c.attr("for", e.attr("id"))
+                        };
+                        var E = new MutationObserver(function() {
+                            D(), N(v, !0)
+                        });
+                        E.observe(e[0], {
+                            attributes: !0
+                        }), e.after(u), N(v), d.on("paste input change focusout", function(t) {
+                            var n = d[0].value,
+                                r = "focusout" === t.type;
+                            N(n = e[0].inputSpinnerEditor.parse(n), r), k(e, t.type)
+                        }).on("keydown", function(t) {
+                            i.keyboardStepping && (38 === t.which ? (t.preventDefault(), s.prop("disabled") || F(b)) : 40 === t.which && (t.preventDefault(), l.prop("disabled") || F(-b)))
+                        }).on("keyup", function(t) {
+                            !i.keyboardStepping || 38 !== t.which && 40 !== t.which || (t.preventDefault(), B())
+                        }), o(s[0], function() {
+                            s.prop("disabled") || (g = !0, F(-b))
+                        }), o(l[0], function() {
+                            l.prop("disabled") || (g = !0, F(b))
+                        }), C = document.body, $ = function() {
+                            !0 === g && (B(), k(e, "change"), g = !1)
+                        }, C.addEventListener("mouseup", function(t) {
+                            $(t)
+                        }), C.addEventListener("touchend", function(t) {
+                            $(t)
+                        }), C.addEventListener("keyup", function(t) {
+                            32 !== t.keyCode && 13 !== t.keyCode || (n = !1, $(t))
+                        })
+                    }
+                    var C, $;
+
+                    function N(t, n) {
+                        void 0 === n && (n = !0), isNaN(t) || "" === t ? (e[0].value = "", n && (d[0].value = ""), v = NaN) : (t = parseFloat(t), t = Math.min(Math.max(t, f), m), e[0].value = t, n && (d[0].value = e[0].inputSpinnerEditor.render(t)), v = t)
+                    }
+
+                    function k(t, e) {
+                        e && setTimeout(function() {
+                            var n;
+                            "function" == typeof Event ? n = new Event(e, {
+                                bubbles: !0
+                            }) : (n = document.createEvent("Event")).initEvent(e, !0, !0), t[0].dispatchEvent(n)
+                        })
+                    }
+
+                    function F(t) {
+                        S(t), B(), void 0 !== i.autoInterval && (r = setTimeout(function() {
+                            a = setInterval(function() {
+                                S(t)
+                            }, i.autoInterval)
+                        }, i.autoDelay))
+                    }
+
+                    function S(t) {
+                        isNaN(v) && (v = 0), N(Math.round(v / t) * t + t), k(e, "input")
+                    }
+
+                    function B() {
+                        clearTimeout(r), clearTimeout(a)
+                    }
+
+                    function D() {
+                        e.prop("required") && (d.prop("required", e.prop("required")), e.removeAttr("required")), d.prop("placeholder", e.prop("placeholder")), d.attr("inputmode", e.attr("inputmode") || "decimal");
+                        var t = e.prop("disabled"),
+                            n = e.prop("readonly");
+                        d.prop("disabled", t), d.prop("readonly", n || i.buttonsOnly), l.prop("disabled", t || n), s.prop("disabled", t || n), (t || n) && B();
+                        var r = e.prop("class"),
+                            o = "";
+                        /form-control-sm/g.test(r) ? o = "input-group-sm" : /form-control-lg/g.test(r) && (o = "input-group-lg");
+                        var a = r.replace(/form-control(-(sm|lg))?/g, "");
+                        u.prop("class", "input-group " + o + " " + i.groupClass), d.prop("class", "form-control " + a), f = isNaN(e.prop("min")) || "" === e.prop("min") ? -1 / 0 : parseFloat(e.prop("min")), m = isNaN(e.prop("max")) || "" === e.prop("max") ? 1 / 0 : parseFloat(e.prop("max")), b = parseFloat(e.prop("step")) || 1, e.attr("hidden") ? u.attr("hidden", e.attr("hidden")) : u.removeAttr("hidden"), e.attr("id") && (d.attr("id", e.attr("id") + "_MP_cBdLN29i2"), c[0] && c.attr("for", d.attr("id")))
+                    }
+                }), this
+            }
+        }(jQuery);
+    </script>
+
+    <style>
+         :root {
+            --bs-blue: #0d6efd;
+            --bs-indigo: #6610f2;
+            --bs-purple: #6f42c1;
+            --bs-pink: #d63384;
+            --bs-red: #dc3545;
+            --bs-orange: #fd7e14;
+            --bs-yellow: #ffc107;
+            --bs-green: #198754;
+            --bs-teal: #20c997;
+            --bs-cyan: #0dcaf0;
+            --bs-white: #fff;
+            --bs-gray: #6c757d;
+            --bs-gray-dark: #343a40;
+            --bs-primary: #0d6efd;
+            --bs-secondary: #6c757d;
+            --bs-success: #198754;
+            --bs-info: #0dcaf0;
+            --bs-warning: #ffc107;
+            --bs-danger: #dc3545;
+            --bs-light: #f8f9fa;
+            --bs-dark: #212529;
+            --bs-font-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, .15), rgba(255, 255, 255, 0))
+        }
+        
+        *,
+        ::after,
+        ::before {
+            box-sizing: border-box
+        }
+        
+        @media (prefers-reduced-motion:no-preference) {
+            :root {
+                scroll-behavior: smooth
+            }
+        }
+        
+        body {
+            margin: 0;
+            font-family: var(--bs-font-sans-serif);
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #212529;
+            background-color: #fff;
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent
+        }
+        
+        b {
+            font-weight: bolder
+        }
+        
+        img,
+        svg {
+            vertical-align: middle
+        }
+        
+        button {
+            border-radius: 0
+        }
+        
+        button:focus:not(:focus-visible) {
+            outline: 0
+        }
+        
+        button,
+        input {
+            margin: 0;
+            font-family: inherit;
+            font-size: inherit;
+            line-height: inherit
+        }
+        
+        button {
+            text-transform: none
+        }
+        
+        [type=button],
+        [type=submit],
+        button {
+            -webkit-appearance: button
+        }
+        
+        [type=button]:not(:disabled),
+        [type=reset]:not(:disabled),
+        [type=submit]:not(:disabled),
+        button:not(:disabled) {
+            cursor: pointer
+        }
+        
+        ::-moz-focus-inner {
+            padding: 0;
+            border-style: none
+        }
+        
+        ::-webkit-datetime-edit-day-field,
+        ::-webkit-datetime-edit-fields-wrapper,
+        ::-webkit-datetime-edit-hour-field,
+        ::-webkit-datetime-edit-minute,
+        ::-webkit-datetime-edit-month-field,
+        ::-webkit-datetime-edit-text,
+        ::-webkit-datetime-edit-year-field {
+            padding: 0
+        }
+        
+        ::-webkit-inner-spin-button {
+            height: auto
+        }
+        
+        ::-webkit-search-decoration {
+            -webkit-appearance: none
+        }
+        
+        ::-webkit-color-swatch-wrapper {
+            padding: 0
+        }
+        
+        ::file-selector-button {
+            font: inherit
+        }
+        
+        ::-webkit-file-upload-button {
+            font: inherit;
+            -webkit-appearance: button
+        }
+        
+        .container-fluid {
+            width: 100%;
+            padding-right: var(--bs-gutter-x, .75rem);
+            padding-left: var(--bs-gutter-x, .75rem);
+            margin-right: auto;
+            margin-left: auto
+        }
+        
+        .row {
+            --bs-gutter-x: 1.5rem;
+            --bs-gutter-y: 0;
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: calc(var(--bs-gutter-y) * -1);
+            margin-right: calc(var(--bs-gutter-x) * -.5);
+            margin-left: calc(var(--bs-gutter-x) * -.5)
+        }
+        
+        .row>* {
+            flex-shrink: 0;
+            width: 100%;
+            max-width: 100%;
+            padding-right: calc(var(--bs-gutter-x) * .5);
+            padding-left: calc(var(--bs-gutter-x) * .5);
+            margin-top: var(--bs-gutter-y)
+        }
+        
+        @media (min-width:768px) {
+            .col-md-1 {
+                flex: 0 0 auto;
+                width: 8.33333333%
+            }
+            .col-md-2 {
+                flex: 0 0 auto;
+                width: 16.66666667%
+            }
+            .col-md-3 {
+                flex: 0 0 auto;
+                width: 25%
+            }
+            .col-md-6 {
+                flex: 0 0 auto;
+                width: 50%
+            }
+            .col-md-11 {
+                flex: 0 0 auto;
+                width: 91.66666667%
+            }
+            .col-md-4 {
+                flex: 0 0 auto;
+                width: 33.33333333%
+            }
+            .col-md-5 {
+                flex: 0 0 auto;
+                width: 41.66666667%
+            }
+            .col-md-12 {
+                flex: 0 0 auto;
+                width: 100%
+            }
+        }
+        
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: .375rem .75rem;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #212529;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border-radius: .25rem;
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out
+        }
+        
+        @media (prefers-reduced-motion:reduce) {
+            .form-control {
+                transition: none
+            }
+        }
+        
+        .form-control[type=file] {
+            overflow: hidden
+        }
+        
+        .form-control[type=file]:not(:disabled):not([readonly]) {
+            cursor: pointer
+        }
+        
+        .form-control:focus {
+            color: #212529;
+            background-color: #fff;
+            border-color: #86b7fe;
+            outline: 0;
+            box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25)
+        }
+        
+        .form-control::-webkit-date-and-time-value {
+            height: 1.5em
+        }
+        
+        .form-control::-moz-placeholder {
+            color: #6c757d;
+            opacity: 1
+        }
+        
+        .form-control:disabled {
+            background-color: #e9ecef;
+            opacity: 1
+        }
+        
+        .form-control::file-selector-button {
+            padding: .375rem .75rem;
+            margin: -.375rem -.75rem;
+            -webkit-margin-end: .75rem;
+            margin-inline-end: .75rem;
+            color: #212529;
+            background-color: #e9ecef;
+            pointer-events: none;
+            border-color: inherit;
+            border-style: solid;
+            border-width: 0;
+            border-inline-end-width: 1px;
+            border-radius: 0;
+            transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out
+        }
+        
+        @media (prefers-reduced-motion:reduce) {
+            .form-control::file-selector-button {
+                transition: none
+            }
+        }
+        
+        .form-control:hover:not(:disabled):not([readonly])::file-selector-button {
+            background-color: #dde0e3
+        }
+        
+        .form-control::-webkit-file-upload-button {
+            padding: .375rem .75rem;
+            margin: -.375rem -.75rem;
+            -webkit-margin-end: .75rem;
+            margin-inline-end: .75rem;
+            color: #212529;
+            background-color: #e9ecef;
+            pointer-events: none;
+            border-color: inherit;
+            border-style: solid;
+            border-width: 0;
+            border-inline-end-width: 1px;
+            border-radius: 0;
+            -webkit-transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+            transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out
+        }
+        
+        @media (prefers-reduced-motion:reduce) {
+            .form-control::-webkit-file-upload-button {
+                -webkit-transition: none;
+                transition: none
+            }
+        }
+        
+        .form-control:hover:not(:disabled):not([readonly])::-webkit-file-upload-button {
+            background-color: #dde0e3
+        }
+        
+        .form-control-sm {
+            min-height: calc(1.5em + (.5rem + 2px));
+            padding: .25rem .5rem;
+            font-size: .875rem;
+            border-radius: .2rem
+        }
+        
+        .form-control-sm::file-selector-button {
+            padding: .25rem .5rem;
+            margin: -.25rem -.5rem;
+            -webkit-margin-end: .5rem;
+            margin-inline-end: .5rem
+        }
+        
+        .form-control-sm::-webkit-file-upload-button {
+            padding: .25rem .5rem;
+            margin: -.25rem -.5rem;
+            -webkit-margin-end: .5rem;
+            margin-inline-end: .5rem
+        }
+        
+        .form-control-lg::file-selector-button {
+            padding: .5rem 1rem;
+            margin: -.5rem -1rem;
+            -webkit-margin-end: 1rem;
+            margin-inline-end: 1rem
+        }
+        
+        .form-control-color:not(:disabled):not([readonly]) {
+            cursor: pointer
+        }
+        
+        .form-floating>.form-control:not(:-moz-placeholder-shown) {
+            padding-top: 1.625rem;
+            padding-bottom: .625rem
+        }
+        
+        .form-floating>.form-control:not(:-moz-placeholder-shown)~label {
+            opacity: .65;
+            transform: scale(.85) translateY(-.5rem) translateX(.15rem)
+        }
+        
+        .btn {
+            display: inline-block;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #212529;
+            text-align: center;
+            text-decoration: none;
+            vertical-align: middle;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+            background-color: transparent;
+            border: 1px solid transparent;
+            padding: .375rem .75rem;
+            font-size: 1rem;
+            border-radius: .25rem;
+            transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out
+        }
+        
+        @media (prefers-reduced-motion:reduce) {
+            .btn {
+                transition: none
+            }
+        }
+        
+        .btn:hover {
+            color: #212529
+        }
+        
+        .btn:focus {
+            outline: 0;
+            box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25)
+        }
+        
+        .btn:disabled {
+            pointer-events: none;
+            opacity: .65
+        }
+        
+        .btn-success {
+            color: #fff;
+            background-color: #198754;
+            border-color: #198754
+        }
+        
+        .btn-success:hover {
+            color: #fff;
+            background-color: #157347;
+            border-color: #146c43
+        }
+        
+        .btn-primary {
+            color: #fff;
+            background-color: #0d6efd;
+            border-color: #0d6efd
+        }
+        
+        .btn-primary:hover {
+            color: #fff;
+            background-color: #0b5ed7;
+            border-color: #0a58ca
+        }
+        
+        .btn-primary:focus {
+            color: #fff;
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+            box-shadow: 0 0 0 .25rem rgba(49, 132, 253, .5)
+        }
+        
+        .btn-primary:active {
+            color: #fff;
+            background-color: #0a58ca;
+            border-color: #0a53be
+        }
+        
+        .btn-primary:active:focus {
+            box-shadow: 0 0 0 .25rem rgba(49, 132, 253, .5)
+        }
+        
+        .btn-primary:disabled {
+            color: #fff;
+            background-color: #0d6efd;
+            border-color: #0d6efd
+        }
+        
+        .btn-danger {
+            color: #fff;
+            background-color: #dc3545;
+            border-color: #dc3545
+        }
+        
+        .btn-danger:hover {
+            color: #fff;
+            background-color: #bb2d3b;
+            border-color: #b02a37
+        }
+        
+        .btn-danger:focus {
+            color: #fff;
+            background-color: #bb2d3b;
+            border-color: #b02a37;
+            box-shadow: 0 0 0 .25rem rgba(225, 83, 97, .5)
+        }
+        
+        .btn-danger:active {
+            color: #fff;
+            background-color: #b02a37;
+            border-color: #a52834
+        }
+        
+        .btn-danger:active:focus {
+            box-shadow: 0 0 0 .25rem rgba(225, 83, 97, .5)
+        }
+        
+        .btn-danger:disabled {
+            color: #fff;
+            background-color: #dc3545;
+            border-color: #dc3545
+        }
+        
+        .btn-light {
+            color: #000;
+            background-color: #f8f9fa;
+            border-color: #f8f9fa
+        }
+        
+        .btn-light:hover {
+            color: #000;
+            background-color: #f9fafb;
+            border-color: #f9fafb
+        }
+        
+        .btn-light:focus {
+            color: #000;
+            background-color: #f9fafb;
+            border-color: #f9fafb;
+            box-shadow: 0 0 0 .25rem rgba(211, 212, 213, .5)
+        }
+        
+        .btn-light:active {
+            color: #000;
+            background-color: #f9fafb;
+            border-color: #f9fafb
+        }
+        
+        .btn-light:active:focus {
+            box-shadow: 0 0 0 .25rem rgba(211, 212, 213, .5)
+        }
+        
+        .btn-light:disabled {
+            color: #000;
+            background-color: #f8f9fa;
+            border-color: #f8f9fa
+        }
+        
+        .btn-dark {
+            color: #fff;
+            background-color: #212529;
+            border-color: #212529
+        }
+        
+        .btn-dark:hover {
+            color: #fff;
+            background-color: #1c1f23;
+            border-color: #1a1e21
+        }
+        
+        .btn-dark:focus {
+            color: #fff;
+            background-color: #1c1f23;
+            border-color: #1a1e21;
+            box-shadow: 0 0 0 .25rem rgba(66, 70, 73, .5)
+        }
+        
+        .btn-dark:active {
+            color: #fff;
+            background-color: #1a1e21;
+            border-color: #191c1f
+        }
+        
+        .btn-dark:active:focus {
+            box-shadow: 0 0 0 .25rem rgba(66, 70, 73, .5)
+        }
+        
+        .btn-dark:disabled {
+            color: #fff;
+            background-color: #212529;
+            border-color: #212529
+        }
+        
+        .btn-sm {
+            padding: .25rem .5rem;
+            font-size: .875rem;
+            border-radius: .2rem
+        }
+        
+        .progress {
+            display: flex;
+            height: 1rem;
+            overflow: hidden;
+            font-size: .75rem;
+            background-color: #e9ecef;
+            border-radius: .25rem
+        }
+        
+        .progress-bar {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+            color: #fff;
+            text-align: center;
+            white-space: nowrap;
+            background-color: #0d6efd;
+            transition: width .6s ease
+        }
+        
+        @media (prefers-reduced-motion:reduce) {
+            .progress-bar {
+                transition: none
+            }
+        }
+        
+        .progress-bar-striped {
+            background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
+            background-size: 1rem 1rem
+        }
+        
+        .visually-hidden-focusable:not(:focus):not(:focus-within) {
+            position: absolute!important;
+            width: 1px!important;
+            height: 1px!important;
+            padding: 0!important;
+            margin: -1px!important;
+            overflow: hidden!important;
+            clip: rect(0, 0, 0, 0)!important;
+            white-space: nowrap!important;
+            border: 0!important
+        }
+        
+        .mt-1 {
+            margin-top: .25rem!important
+        }
+        
+        .mt-2 {
+            margin-top: .5rem!important
+        }
+        
+        .mt-4 {
+            margin-top: 1.5rem!important
+        }
+        
+        .mb-2 {
+            margin-bottom: .5rem!important
+        }
+        
+        body {
+            font-size: 14px;
+            zoom: 0.8;
+            background-size: cover;
+            background-image: url('/bg.png');
+            background-repeat: no-repeat
+        }
+        
+        .container-fluid {
+            padding-right: 0;
+            padding-left: 0
+        }
+        
+        .nav-title {
+            font-size: 1em;
+            color: #fff;
+            text-shadow: 2px 2px #000;
+            font-weight: 700
+        }
+        
+        .seperator {
+            color: #fff
+        }
+        
+        .nav-title-content {
+            font-size: 1em;
+            color: #ccc;
+            text-shadow: 2px 2px #000
+        }
+        
+        .top-nav {
+            background-color: #000;
+            padding-left: 15px;
+            padding-top: 10px;
+            padding-bottom: 2px
+        }
+        
+        .btn-light {
+            background-color: #fff;
+            color: #000;
+            font-weight: 700;
+            border-color: #000;
+            padding: 0 10px;
+            float: right;
+            margin-right: 10px;
+            margin-top: -4px
+        }
+        
+        .nav-logo-placeholder {
+            background-image: url('data:image/png;base64,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');
+            background-position: right;
+            background-repeat: no-repeat;
+            background-size: cover;
+            opacity: .5;
+            height: 150px
+        }
+        
+        .logo {
+            height: auto;
+            margin-top: 35px;
+            margin-left: 1.7%
+        }
+        
+        .grayscale {
+            filter: grayscale(100%)
+        }
+        
+        .stats {
+            margin-top: 95px
+        }
+        
+        .stat-icon {
+            width: 15%
+        }
+        
+        .nav-stats-content {
+            font-weight: 700;
+            font-size: 16px
+        }
+        
+        .controller {
+            margin-left: 2px
+        }
+        
+        .btn-circle.btn-xl {
+            padding: 20px 16px;
+            font-size: 24px;
+            line-height: 1.33;
+            border-radius: 35px
+        }
+        
+        .btn-circle.btn-xl i {
+            margin-bottom: 5px;
+            font-size: 25px
+        }
+        
+        .btn-circle.btn-xl span {
+            padding-top: 5px;
+            font-size: 14px
+        }
+        
+        .nav-stats-title b {
+            font-weight: 700;
+            font-size: 1.2em
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row top-nav">
+            <div class="col-md-2">
+                <span class="nav-title">Network</span>
+                <span class="seperator">|</span>
+                <span class="nav-title-content">Vodafone. Net</span>
+            </div>
+            <div class="col-md-2">
+                <span class="nav-title">Signal Strength</span>
+                <span class="seperator">|</span>
+                <span class="nav-title-content">Good</span>
+            </div>
+            <div class="col-md-2">
+                <span class="nav-title">IP Address</span>
+                <span class="seperator">|</span>
+                <span class="nav-title-content">192.168.2.6</span>
+            </div>
+            <div class="col-md-2">
+                <span class="nav-title">Memory</span>
+                <span class="seperator">|</span>
+                <span class="nav-title-content">%65</span>
+            </div>
+            <div class="col-md-2"></div>
+            <div class="col-md-2">
+                <button type="button" id="forgetNetworkBtn" class="btn btn-light">Forget Network</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 nav-logo-placeholder">
+                <div class="row">
+                    <div class="col-md-6">
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAA2CAMAAADeUz+5AAAOu3pUWHRSYXcgcHJvZmlsZSB0eXBlIGV4aWYAAHjapZlblhs5DkT/uYpZAl/gYzkkCJ4zO5jlz0Wmym5Xuz88I7n0SKWSIBARCMjB/vPvG/7FrchsoUofbbYWudVZZ168GPG9recxxfo8Prf59Sr9ejyU9vlS5lDhubxvx+d4+jr++cLXc1q8kr9caOjng/3rB7N+rj++XeizUPGIMi/O50Lzc6GS3w/S5wLr3VZsc/S/bmHb+/z5/psG/oI/XM3Tj8l+P/v+vnayd4R1Ss5WUok85jLeAIr/5VAWLwqPuQgnptJ4LWXyWEr+REJCfpenHzeWDddDrb896ZeqxH+oVs6fHH2vVs2fU8q3JLcfz789HpL8vipP6v+ych2fV/nX4yRf34i+Zf9J/j3jPntmF6s2Ut0+m/ra4vOK8yhH9aVHILQWO3/CJfpzn9wHqFagcFhvc9c0U6ZcN9V00ko32fOsSQmxZgu58yJnzeU5OErPM2vx+lW/p5s7NTxlUFel7IWj+Ucs6Vl2Rg3PaoOVT+LUnLhYclz86T386Rfu9dym5LnMb4WJK2dPNmF45fyR06hIup+kypPgr/v3m9e1UEHxLDtFJond7yW2pJ9KUJ5CF04Unl8Opn4+FyBFLC0EkwoVoGqpSGop9px7SiRyUKBF6LnUvKlAEsmHIHMtpVGbkX1pvtLTc2qWzOHAccSMSggs69QGllGsWgX89DrA0JIiVUSadBkyZbXSapPWWm8uiquXXkOX3nrvo8++Rhl1yGijjzHmWDPPgmgipLPPMedcizUXV158e3HCWjvvsuuWsNvue+y5lwIfrSratOvQqevkUw76cdrpZ5x5liUDSlZNrFm3YdPWBWq3hFuv3Hb7HXfe9aNqn7L+7f4HVUufquWnUn5i/1E1jvb+dYnkciJeMwqWQ01UvHsJAHT2msWRas1eOa9ZnBlWSCZI8Zqd5BWjgtVSlpu+ahfyW1Gv3P9Vt9DrL3XL/2vlgpfuDyv397r9rmrH25A+FXtZ6EmNBfbdMm5cNll2LVt6+NZYRtLG2C2ktNtUM4llarqy9rbcbzTZ5tvo6I61LGW3Kq2f65ekaD2dslne+lzH4g2TrrV21TO1pN1bpDGRZK78fOV5nNZX33cra8oiE5NGr8ssLy3jrJqMHHGilTXs2FUX29RgtF5YXittcKixT7UyDBnvVyfZarcqGa5j5dTqht4rqAIx1FRjUvLV9RIFj9OSwKJT+zhnaNk3j8uBWA4Hb5GTbLccN9Kd692hVLlFT45jWuu56pA+211gVCXvMXedZ0w/zTcZ01kdUfFtIysiV0jIXBaK7JHaMdoTDmYXHd1oJUa2atLerC1tAwZBil3vKmxwtAbEGkAR70mrkwpadrEjk7JjtkBJB+rxCHo1O/moK7Kho6lp3lgik3IXVe7DFpu0eUhVXFOCNotUKbqyb6FiJHBiIMhYXHWneQ06PchINvqxxWZL36yY12HL21/XFlSuUclDcQdsaXmb+5MdL5WEZerltnq49tnwa8/71FnXLdf2ac3fnxTaEbGzr1UhsXyk7DqvmZrZWZcdXQKrM81DKpscL1re2eAtS4JdhXsg+6kFukBR1oUKSgYEiu6jULhNL+2EFnMlWfW2mYiyOYxAbbx9zc7mk4ZNgLfOS9YODF8Tr0sr6ZDzSqefgwf3EJ2mvZ5t7SwgfpPp550XEocXNovvcRQYUmRXPkssB4V8KaJcL1U2mF5bWlrixbqZk6rAmrKaWr0oJDi6pFVJ+qwXDfixlvpa0BxUEO5mT7unLtmFaRcAPSIoiIZI3tDYJJIDfATLYZnWPtaFeWWrw0kRwjlBbNpS+9luo7dRXw9jOwkTJZcVVvfVuTKgLLc82WpDt94xjPIuOPoSAtEu8IoktjpgZ0/bdSK65EwLEAtbdRcqGKECVEKEicPAT9/oS6nN9FxU3R0Um1gOD0yW01571IajEw1YE1v1oFxYsrWQuFoWILnU9+42hPZHC6EFSKSI8BDqD3Z9kHi2cyC6RxyQHYSvLRoHTOxNl5e8IVb+8UjkTxzRECoeV+UKhSxLOopeloNmD/RsBjZsCSUm50tmzgQBi702JN1zScObR5GO2juYQ6aVGnZk9Za0NiUd5H8GAlM0yx7NgJjad0PmJBeb4iJGuo/H1HFd7j61oDJZ+WO3V7RndHhd/BEnoZ0oOIpyS04TMUJAbqJ12Obah/xKqgbTei0b9W03HUa7zCy2ZVSyskPqk55taP9shbTfjuyRbVKAjrERMDyp5fFumeizlFvRC5WpLJAHHccFJZwK6IfmtgcZmFD+RU0CFlAAzStxFsgpp+qDeNQGRfRDZMVw9s+Bh/370L4uJd2pitMskW9qopr2JvtsiPKxxjRhw3MxDpIldAtrPlq61R6pxUuUftfuZ9JmGq0buiT0FWuCsvM6lgGxaC5o5fWl5Ui9aDwzWcNv0hQCucOEHjZ22kIdRxo2gBSg9gbIgEmyIy9oTTC1jk3PlwbrGVhk0bgGye074DuOcqKSHNr8SOoWoIAFvVseASyzgWAjU8WjcTCZd1xEbitopldnd/51sDe3JuwYGALsYdrmBYn56FkMGIrI43pgJ2YgbsJk3GMxfApXrXueE253Nayoc1PdPvNschjN+F5JF9mlV6LeeCY6M27PPRBZaRnR3qOChYTRwPqt9HAPQ3UJfb9+A5vBP2HJNQA3wFqJrs4lKA3+BYfQyrzijCGZ99Rw4DYO69BGsg02qKmzXXbrXVfiAm0XaUDGKAJ06rt3uuIZjdhyWxjVTvcKGNPF9woIwb1gK4EG5PFuKTgSmlLCOgD7yrUiNXPxIRYdT39zl7GOaA0FC3msEQ4kaxhURYum+dqUpp9G3nGYKF5j9XZQL8pNs202VsOAoMKCyAQANB7/NVqHg+g24y41BR50EWbRR5dOp1F6BCNDGuxhw/CzFSLFnMHbHMggWlourQRPhd/0noJP8egPuoDPxMEOi3MUzKolbCP4oGIR+clc61QEswbB3wIb4Pw368JxF/S04f2tghDNlSOEVzLKBILYoMxoQCefASv/bKEDwfp0FAZr6g0/pxsesoJqqjt1OgKmnTaE3WgwG63AvzQshpFsmZAUcOdZISHp8sBHlUIvAtwY5EwTQdIXXr34euDHyKrHblM7wpcxLqEh1JckIMz4gzqx24DAsrd/qF27YYHwIk7bCN7QMJro9FlhC3um6xWGSA2GaiKEihwhhA8pXZgGacYTbf8RIB4lTS6SmulRGSdOxzpuW5fbRiSzlFDYMxuO6eFEhqYAuh0fC9vF9m1kj96OMb7gDt+O0pnQb6n7GR32+y8KPmZVqoYZQIMYRYF0stg3bL+0SNrQPRHeP22dCiCDiH5CKUhwpMcpGSwYqxqIPeKUTpun07oZxChRyp0Z6zBOsHJGsKTiRicNH1UlvsyKjN7l6V+N+PIOYBWJXUASTipYArvQyAUpqcspG0X3D6MQrtsvCKEtmjN1eA8k1+0gteNkGis9Ec6DcJ9GKvaPGu/1/MYG4GA9IFuLVuXuXBATAJ0zMyxQr66rCBtFlmhYHaffXG27i2B6EMJEZQ17PTNtRoRxDU5EWA4qGXQZVVx28Uz5njDbz13Rs559RXcRPmwwxjrfupq7Whwt20MZST9Cij4wRfpo+biRNukjDKe0xoKyRZwf3s9NNJYUoZ+Myi5jAINRk4H5fnltPN/jLy1ulCfchAs27DSzi2sdoyHM8FnBJyu4lhiOfAEPAz8PmrCS1TaV2mAOH7TY8g4MXFBrJ5iRl9SBhaYjFb5HP+hCdfABYJbWRe8kHBoWYzOYgR8x47UNv7Qk9M1pbIqugx2JPlfWzsUhF4p9gAnNXv23ggPlaLU+eEsDjJhrj4YtUtcYCo4BNCCxkt2FM2qhd48DhkIxY/GYS+6Gmx20u0VDkpntmLvpT3sMgEzE4TQ3dWgolcZgDd9STkxF7rN82mkeCJTdMM2h1Kka8Xc8Clhn6aN89wbccyt0JPcHSCy4IKMspsQUmeJwdNPLhzdiY8gkcwdYYGHUi3bSV4Yug2QXwT+gyKvSRLUqgTfD2wA98Msc57Wc7qjZF3TA+nIiY+JGW0vE2WPSRmMUxatnPHSGVakvPHJPj5/HNS0axWDUfX6nYLrs1Yn5HcKvPcYbmY8Y/ob5/RmBGTzp4qADK8sgMBno3BejxYKAkhtYyXCPW6Yze4GjjJAaco+pBRIM2WX5KL4Y4d2YIzos7Cp020kDHQNfuh4Fpo1XHCrWc4KdypiV3GoK7rIt9xDDLQQsYeyg14J3Q6mcFuOlxc0/aQEr2DszDIEF6mpKvSEQhXObShNy989UWnGuhbFgR//ZRxeqO9EAnEA5dCnlBliq/1h/GPzuepKBUKWC32KUnvaOe3TbRRuOvsTp7zGQnMc6OORU33P4RCMN0geDJ2zPc/J94xqxsk9H+dl6HbMM0i3DZZ700h+xUTaO50pmWLiFiVNmPGNIs4qlonUmJ6X/FEPgDGeFLl+lu8bR3YApJaBtU+7NYLqZlnpQZrtBtINZYxU35fVgBPcLhIrdfS08LsTpYJt6MePVQSAbm5rwQpiwEnBF/fmhvBMQZT2RzQnntL4Z629FdfZifGYWYU5huGCEh9OTmZ5RayJYbs5iwG89P8wtM6PzMDIyKu7BgGKyYR29e08Muv8K59VS8/+AGb4ag01ZfFcYNy2QPHX7BV4ZXxAWMMdFBYUDtdElF0c1y4h4N7tAtjJW01OoHV5MMUeYWXKE2Wj+mkzRnYD5OLbcg1PxzAZJ+E7DJ30iXxzp/hbTiyJt/zmwsiEm25BgRqtOU8SYqiJGiIIx5ZCYUYSwiI7ZkywxLdKs6FHP7srJfmUG2IMIhAF1igvVYqwB8NTz+H9C5AUIJlhkN8Tok1u7JANkelvwpI/jM0pEepl6GEVjhmA+WF5cIItwseUI5YJHq+FJ9LgYJv/PGqYwDBo+x39CVZxAnExZRVbYjksPWw2netNTfZA6x1uZGuM/PKM8DAzhv5OmdHsx+edzAAABhGlDQ1BJQ0MgcHJvZmlsZQAAeJx9kT1Iw0AcxV8/pCItDnZQcchQBcGCqIijVqEIFUKt0KqDyaVf0KQhSXFxFFwLDn4sVh1cnHV1cBUEwQ8QRycnRRcp8X9JoUWMB8f9eHfvcfcO8DcqTDWD44CqWUY6mRCyuVUh9IoABhBBEKMSM/U5UUzBc3zdw8fXuzjP8j7354goeZMBPoF4lumGRbxBPL1p6Zz3iaOsJCnE58RjBl2Q+JHrsstvnIsO+3lm1Mik54mjxEKxg+UOZiVDJZ4ijimqRvn+rMsK5y3OaqXGWvfkLwzntZVlrtMcQhKLWIIIATJqKKMCC3FaNVJMpGk/4eEfdPwiuWRylcHIsYAqVEiOH/wPfndrFiYn3KRwAuh6se2PYSC0CzTrtv19bNvNEyDwDFxpbX+1Acx8kl5va7EjoHcbuLhua/IecLkD9D/pkiE5UoCmv1AA3s/om3JA3y3Qs+b21trH6QOQoa5SN8DBITBSpOx1j3d3d/b275lWfz9GFXKVPCYIWwAADRxpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+Cjx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDQuNC4wLUV4aXYyIj4KIDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+CiAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIgogICAgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIKICAgIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIKICAgIHhtbG5zOkdJTVA9Imh0dHA6Ly93d3cuZ2ltcC5vcmcveG1wLyIKICAgIHhtbG5zOnRpZmY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vdGlmZi8xLjAvIgogICAgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIgogICB4bXBNTTpEb2N1bWVudElEPSJnaW1wOmRvY2lkOmdpbXA6OWQyOTVmM2UtNmQwYS00Y2U2LWFjMmItMTAzOGIxZWU0YzdlIgogICB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjE4N2RiNzQ1LWViZGYtNDhhZS04MGMzLWFjZTEzZGVkN2VjZCIKICAgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOmFhZTA3ODgyLTgyNmUtNGQ2OS05YTY2LWFlNDFiMDAyOGZlNiIKICAgZGM6Rm9ybWF0PSJpbWFnZS9wbmciCiAgIEdJTVA6QVBJPSIyLjAiCiAgIEdJTVA6UGxhdGZvcm09Ik1hYyBPUyIKICAgR0lNUDpUaW1lU3RhbXA9IjE2NDgyMTY3NzU5NTg1MDYiCiAgIEdJTVA6VmVyc2lvbj0iMi4xMC4yOCIKICAgdGlmZjpPcmllbnRhdGlvbj0iMSIKICAgeG1wOkNyZWF0b3JUb29sPSJHSU1QIDIuMTAiPgogICA8eG1wTU06SGlzdG9yeT4KICAgIDxyZGY6U2VxPgogICAgIDxyZGY6bGkKICAgICAgc3RFdnQ6YWN0aW9uPSJzYXZlZCIKICAgICAgc3RFdnQ6Y2hhbmdlZD0iLyIKICAgICAgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpiMGE0MDY5Ny0xY2M2LTQwMWUtYmZmZC1kYzBiYWVmNDYxMmUiCiAgICAgIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkdpbXAgMi4xMCAoTWFjIE9TKSIKICAgICAgc3RFdnQ6d2hlbj0iMjAyMi0wMy0yNVQxNjo1OTozNSswMzowMCIvPgogICAgPC9yZGY6U2VxPgogICA8L3htcE1NOkhpc3Rvcnk+CiAgPC9yZGY6RGVzY3JpcHRpb24+CiA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgCjw/eHBhY2tldCBlbmQ9InciPz6TzeZoAAADAFBMVEUZGBhHcEwTExNWVlZCQkKenp6AgIAvLy9PT0+fn5+ioqJ7enq1tbWRkZEGBgaYmJgkJCQzMzNvb2+7u7sODw9ISEgXFxeYmJiMjIyenp6Dg4McHBx+fn6Tk5N3dnbExMRKS0uqqqobGxs6OjogICA6Ojp4eHhBQUEjIyMWFhaBgYGfn59AQEAeHh6AgICpqakWFhZpaWmSkpJOTk4lJSU8PDwyMjKHh4djY2MpKSlSUlJWVlYqKiqfn58uLS0oKCg4ODgZGRkbGxtzcnJubm6Wlpa1tbVYWFhRUVFdXFxvb28SEhIICAhoaGgzMzOtra1UVFRERER2dnYqKio2Nja/v785OTnCwsKAgIApKSkoKCgmJiZRUVE4ODhDQ0M4ODiKiYmYmJhDQkIwMDAQEBAwMDC+vr4YGBg5OTkmJSUSEhJ0dHQsLCwiIiIpKSk3NzdiYmJVVVU1NTWrq6tcXFw/Pz9OTk5ISEgcHBwsLCw9PT0xMTFJSUkcHBx+fn6FhYUjIyMdHR2fn5+CgoJiYmJBQUEMCwsvLy8fHx9NTU2goKBvb2+4uLh2dXVgYGAXFxcMDAyDg4NAQEAhISEXFxdQUFCMjIwyMjJDQ0NPT089PT1VVVWHh4cqKipycnIfHx9kZGTGxsYTExNvb29xcXGcnJxnZ2dGRkaGhoZ+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"
+                            class="grayscale logo" alt="Neckog Industries">
+                    </div>
+                    <script>
+                        $(document).ready(function() {
+                            $('#nozzle').inputSpinner()
+                            $('#table').inputSpinner()
+                            var uzunluk = $('.col-md-4').length;
+                            for (var i = 0; i < uzunluk; i++) {
+                                $('.col-md-4:eq(' + i + ')').css('width', '30%')
+                            }
+                            var uzunluk = $('.input-group').length;
+                            for (var i = 0; i < uzunluk; i++) {
+                                $('.input-group:eq(' + i + ') input').css('width', '40%');
+                                var childlength = document.querySelectorAll('.input-group')[i].children.length;
+                                for (var c = 0; c < childlength; c++) {
+                                    document.querySelectorAll('.input-group')[i].children[c].style.float = 'left';
+                                }
+                            }
+                            $('.stats img:eq(0)').css('width', '12%');
+                            $('.stats img:eq(1)').css('width', '15%');
+                            //$('.stats img:eq(2)').css('width','15%');
+
+
+                        })
+                    </script>
+                    <div class="col-md-6">
+                        <div class="row stats">
+
+                            <div class="col-md-4">
+                                <img class="stat-icon" src="/nozzle.png" style='float: left;'>
+                                <span class="nav-stats-title">
+                                    <input id="nozzle" type="number" value="0" min="0" max="350" step="10"/>
+                                </span>
+                            </div>
+                            <div class="col-md-4">
+                                <img class="stat-icon" src="/table.png" style='float: left;'>
+                                <span class="nav-stats-title">
+                                    <input id="table" type="number" value="0" min="0" max="350" step="10"/>
+                                </span>
+                            </div>
+                            <div class="col-md-4">
+                                <span class="nav-stats-title"><img class="stat-icon" src="/cube.png"></span>
+                                <span class="seperator">|</span>
+                                <span class="nav-stats-content">30 &#8451;</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row controller mt-4">
+                <div class="col-md-11">
+                    <form method="POST" action="#" enctype="multipart/form-data" id="upload_form">
+                        <input class="form-control form-control-sm" accept=".txt, .gcode" name="data" id="file" type="file">
+                    </form>
+                </div>
+                <div class="col-md-1">
+                    <input type="button" class="btn btn-primary btn-sm form-control" style="float: right;" value="Upload">
+                </div>
+            </div>
+            <div class="row controller mt-2">
+                <div class="col-md-12 mb-2">
+                    <div class="progress">
+                        <div class="progress-bar  progress-bar-striped" role="progressbar" style="width: 0%;" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row controller mt-1">
+                <div class="col-md-3"><svg width="100%" height="200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="path" data-direction="up" d="M14.8284 6.34313L16.2426 4.92892L12 0.686279L7.75735 4.92892L9.17156 6.34313L12 3.51471L14.8284 6.34313Z" fill="currentColor"></path>
+                <path class="path" data-direction="left" d="M4.92892 16.2426L6.34313 14.8284L3.51471 12L6.34313 9.17156L4.92892 7.75735L0.686279 12L4.92892 16.2426Z" fill="currentColor"></path>
+                <path class="path" data-direction="down" d="M7.75735 19.0711L12 23.3137L16.2426 19.0711L14.8284 17.6568L12 20.4853L9.17156 17.6568L7.75735 19.0711Z" fill="currentColor"></path>
+                <path class="path" data-direction="right" d="M17.6568 9.17156L20.4853 12L17.6568 14.8284L19.0711 16.2426L23.3137 12L19.0711 7.75735L17.6568 9.17156Z" fill="currentColor"></path>
+                <text style="fill:#333;font-family:Arial,sans-serif;font-size:4.6px;font-weight:700;white-space:pre" x="7.37" y="13.804">X / Y</text></svg></div>
+                <div class="col-md-3"><svg width="100%" height="200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="path" data-direction="zup" d="M14.8284 6.34313L16.2426 4.92892L12 0.686279L7.75735 4.92892L9.17156 6.34313L12 3.51471L14.8284 6.34313Z" fill="currentColor"></path>
+                <path class="path" data-direction="zdown" d="M7.75735 19.0711L12 23.3137L16.2426 19.0711L14.8284 17.6568L12 20.4853L9.17156 17.6568L7.75735 19.0711Z" fill="currentColor"></path>
+                <text style="fill:#333;font-family:Arial,sans-serif;font-size:4.6px;font-weight:700;white-space:pre" x="10.67" y="13.791">Z</text></svg></div>
+                <div class="col-md-3"><svg width="100%" height="200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="path" data-direction="eup" d="M14.8284 6.34313L16.2426 4.92892L12 0.686279L7.75735 4.92892L9.17156 6.34313L12 3.51471L14.8284 6.34313Z" fill="currentColor"></path>
+                <path class="path" data-direction="edown" d="M7.75735 19.0711L12 23.3137L16.2426 19.0711L14.8284 17.6568L12 20.4853L9.17156 17.6568L7.75735 19.0711Z" fill="currentColor"></path>
+                <text style="fill:#333;font-family:Arial,sans-serif;font-size:4.6px;font-weight:700;white-space:pre" x="10.67" y="13.791">E</text></svg></div>
+                <div class="col-md-2"></div>
+                <div class="col-md-1">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button class="form-control btn btn-dark mb-2 path" id="xhome" data-direction='motoroff'>
+                            Motor Off
+                        </button>
+                        </div>
+                        <div class="col-md-12">
+                            <button class="form-control btn btn-dark mb-2 path" id="xhome" data-direction='xhome'>
+                            <svg width="30%" height="30%" enable-background="new 0 0 330.242 330.242" version="1.1" viewBox="0 0 330.24 330.24" xmlns="http://www.w3.org/2000/svg">
+<path d="m324.44 129.81-41.321-33.677v-53.859c0-6.065-4.935-11-11-11h-26c-6.065 0-11 4.935-11 11v14.737l-55.213-44.999c-3.994-3.254-9.258-5.047-14.822-5.047-5.542 0-10.781 1.782-14.753 5.019l-144.53 117.82c-6.567 5.351-6.173 10.012-5.354 12.314 0.817 2.297 3.448 6.151 11.884 6.151h19.791v154.95c0 11.058 8.972 20.053 20 20.053h62.5c10.935 0 19.5-8.809 19.5-20.053v-63.541c0-5.446 5.005-10.405 10.5-10.405h42c5.238 0 9.5 4.668 9.5 10.405v63.541c0 10.87 9.388 20.053 20.5 20.053h61.5c11.028 0 20-8.996 20-20.053v-154.95h19.791c8.436 0 11.066-3.854 11.884-6.151 0.819-2.302 1.213-6.963-5.354-12.313z" fill="#fff"/>
+</svg> X
+                        </button>
+                        </div>
+                        <div class="col-md-12">
+                            <button class="form-control btn btn-dark mb-2 path" id="yhome" data-direction='yhome'>
+                            <svg width="30%" height="30%" enable-background="new 0 0 330.242 330.242" version="1.1" viewBox="0 0 330.24 330.24" xmlns="http://www.w3.org/2000/svg">
+<path d="m324.44 129.81-41.321-33.677v-53.859c0-6.065-4.935-11-11-11h-26c-6.065 0-11 4.935-11 11v14.737l-55.213-44.999c-3.994-3.254-9.258-5.047-14.822-5.047-5.542 0-10.781 1.782-14.753 5.019l-144.53 117.82c-6.567 5.351-6.173 10.012-5.354 12.314 0.817 2.297 3.448 6.151 11.884 6.151h19.791v154.95c0 11.058 8.972 20.053 20 20.053h62.5c10.935 0 19.5-8.809 19.5-20.053v-63.541c0-5.446 5.005-10.405 10.5-10.405h42c5.238 0 9.5 4.668 9.5 10.405v63.541c0 10.87 9.388 20.053 20.5 20.053h61.5c11.028 0 20-8.996 20-20.053v-154.95h19.791c8.436 0 11.066-3.854 11.884-6.151 0.819-2.302 1.213-6.963-5.354-12.313z" fill="#fff"/>
+</svg> Y
+                        </button>
+                        </div>
+                        <div class="col-md-12">
+                            <button class="form-control btn btn-dark path" id="zhome" data-direction='zhome'>
+                            <svg width="30%" height="30%" enable-background="new 0 0 330.242 330.242" version="1.1" viewBox="0 0 330.24 330.24" xmlns="http://www.w3.org/2000/svg">
+<path d="m324.44 129.81-41.321-33.677v-53.859c0-6.065-4.935-11-11-11h-26c-6.065 0-11 4.935-11 11v14.737l-55.213-44.999c-3.994-3.254-9.258-5.047-14.822-5.047-5.542 0-10.781 1.782-14.753 5.019l-144.53 117.82c-6.567 5.351-6.173 10.012-5.354 12.314 0.817 2.297 3.448 6.151 11.884 6.151h19.791v154.95c0 11.058 8.972 20.053 20 20.053h62.5c10.935 0 19.5-8.809 19.5-20.053v-63.541c0-5.446 5.005-10.405 10.5-10.405h42c5.238 0 9.5 4.668 9.5 10.405v63.541c0 10.87 9.388 20.053 20.5 20.053h61.5c11.028 0 20-8.996 20-20.053v-154.95h19.791c8.436 0 11.066-3.854 11.884-6.151 0.819-2.302 1.213-6.963-5.354-12.313z" fill="#fff"/>
+</svg> Z
+                        </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row controller mt-2">
+                <div class="col-md-11">
+                    <input type="text" class="form-control form-control-sm" id="gcode" name="gcode" placeholder="Input gcode command and press Send button">
+                </div>
+                <div class="col-md-1">
+                    <input type="submit" class="btn btn-primary btn-sm form-control" style="float: right;" value="Send">
+                </div>
+            </div>
+            <div class="row controller mt-4">
+                <div class="col-md-11" id="dirlist">
+                    <div class="row"></div>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-danger btn-circle btn-xl form-control path" data-direction='emergencystop'>
+                    <svg width="50%" height="50%" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(1, 0, 0, 1, 4.42827, 10.871631)">
+    <path d="M476.099,353.968l-170.2-294.8c-27.8-48.7-98.1-48.7-125.8,0l-170.3,294.8c-27.8,48.7,6.8,109.2,62.9,109.2h339.9 C468.699,463.168,503.899,402.068,476.099,353.968z M242.899,397.768c-14.8,0-27.1-12.3-27.1-27.1s12.3-27.1,27.1-27.1 c14.8,0,27.1,12.3,26.5,27.8C270.099,385.468,257.099,397.768,242.899,397.768z M267.599,222.568c-1.2,21-2.5,41.9-3.7,62.9 c-0.6,6.8-0.6,13-0.6,19.7c-0.6,11.1-9.3,19.7-20.4,19.7s-19.7-8-20.4-19.1c-1.8-32.7-3.7-64.8-5.5-97.5 c-0.6-8.6-1.2-17.3-1.9-25.9c0-14.2,8-25.9,21-29.6c13-3.1,25.9,3.1,31.5,15.4c1.9,4.3,2.5,8.6,2.5,13.6 C269.499,195.468,268.199,209.068,267.599,222.568z" style="fill: rgb(255, 255, 255);"/>
+  </g>
+  <g transform="matrix(1, 0, 0, 1, 4.42827, 10.871631)"/>
+  <g transform="matrix(1, 0, 0, 1, 4.42827, 10.871631)"/>
+  <g transform="matrix(1, 0, 0, 1, 4.42827, 10.871631)"/>
+  <g transform="matrix(1, 0, 0, 1, 4.42827, 10.871631)"/>
+  <g transform="matrix(1, 0, 0, 1, 4.42827, 10.871631)"/>
+  <g transform="matrix(1, 0, 0, 1, 4.42827, 10.871631)"/>
+  <g transform="matrix(1, 0, 0, 1, 4.42827, 10.871631)"/>
+  <g transform="matrix(1, 0, 0, 1, 4.42827, 10.871631)"/>
+  <g transform="matrix(1, 0, 0, 1, 4.42827, 10.871631)"/>
+  <g transform="matrix(1, 0, 0, 1, 4.42827, 10.871631)"/>
+  <g transform="matrix(1, 0, 0, 1, 4.42827, 10.871631)"/>
+  <g transform="matrix(1, 0, 0, 1, 4.42827, 10.871631)"/>
+  <g transform="matrix(1, 0, 0, 1, 4.42827, 10.871631)"/>
+  <g transform="matrix(1, 0, 0, 1, 4.42827, 10.871631)"/>
+  <g transform="matrix(1, 0, 0, 1, 4.42827, 10.871631)"/>
+</svg> 
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <span>Emergency Stop</span>
+                </button>
+                </div>
+            </div>
+
+
+        </div>
+        <script>
+            $(document).ready(function() {
+                $("#forgetNetworkBtn").click(function() {
+                    $.get("forgetnetwork", function(t, n) {
+                        "1" == t && alert("You disconnected from current network. You can connect to another network")
+                    })
+                }), $(".btn-primary:eq(0)").click(function() {
+                    $("form").submit()
+                }), $("form").submit(function(t) {
+                    t.preventDefault();
+                    var n = $("#upload_form")[0],
+                        e = new FormData(n);
+                    e.append("file", $("#file")[0].files[0]), console.log(e), $.ajax({
+                        url: "/update",
+                        type: "POST",
+                        data: e,
+                        contentType: !1,
+                        processData: !1,
+                        xhr: function() {
+                            var t = new window.XMLHttpRequest;
+                            return t.upload.addEventListener("progress", function(t) {
+                                if (t.lengthComputable) {
+                                    var n = t.loaded / t.total;
+                                    $(".progress-bar").css("width", Math.round(100 * n) + "%").text(Math.round(100 * n) + "%"), $(".progress-bar").text().indexOf("100") > -1 && location.reload()
+                                }
+                            }, !1), t
+                        },
+                        success: function(t, n) {
+                            console.log("success!")
+                        },
+                        error: function(t, n, e) {}
+                    })
+                }), setTimeout(function() {
+                    $(".logo").attr("src", "/logo.png")
+                }, 500), setTimeout(function() {
+                    $(".nav-logo-placeholder").css("background-image", "url('/header.png')")
+                }, 1500), setTimeout(function() {
+                    $("body").css("background-image", "url('/bg.png')")
+                }, 1e3), setTimeout(function() {
+                    $(".stat-icon:eq(0)").attr("src", "/nozzle.png")
+                }, 250), setTimeout(function() {
+                    $(".stat-icon:eq(1)").attr("src", "/table.png")
+                }, 300), setTimeout(function() {
+                    $(".stat-icon:eq(2)").attr("src", "/cube.png")
+                }, 2350), setTimeout(function() {
+                    $(".btn-dark img:eq(0)").attr("src", "/home.png")
+                }, 375), setTimeout(function() {
+                    $(".btn-dark img:eq(1)").attr("src", "/home.png")
+                }, 400), setTimeout(function() {
+                    $(".btn-dark img:eq(2)").attr("src", "/home.png")
+                }, 425), $(".button").css("padding-top", "33%"), $(".button").css("font-weight", "bold"), setTimeout(function() {
+                    $.get("listDir", function(t, n) {
+                        console.log(t);
+                        for (var e = t.split("\n"), o = 0; o < e.length; o++)
+                            if ("" != e[o]) {
+                                var i = e[o].split("|")[0],
+                                    c = e[o].split("|")[1];
+                                $("#dirlist .row").append("\n                              <div class='col-md-4 mt-2'>\n                                " + i + "\n                              </div> \n                              <div class='col-md-4 mt-2'>\n                                " + c + "\n                              </div> \n                              <div class='col-md-1 mt-2'>\n                                <button data-filename='" + i + '\' class=\'btn btn-danger btn-sm\' href=\'#\'><svg viewBox="0 0 28 39" width="30" height="30" xmlns="http://www.w3.org/2000/svg">\n<g transform="translate(-4.025 1)">\n<path d="m26.361 4.052h-3.564c4e-3 -0.039 0.021-0.074 0.021-0.114 0-2.171-1.767-3.938-3.937-3.938h-4.125c-2.171 0-3.938 1.767-3.938 3.938 0 0.041 0.019 0.075 0.023 0.114h-2.816c-1.656 0-3 1.344-3 3v1.167h24.333v-1.167c3e-3 -1.656-1.34-3-2.997-3zm-13.543-0.114c0-1.068 0.87-1.938 1.938-1.938h4.125c1.067 0 1.938 0.869 1.938 1.938 0 0.041 0.019 0.075 0.022 0.114h-8.046c4e-3 -0.039 0.023-0.074 0.023-0.114zm-7.792 27.448c0 1.656 1.344 3 3 3h18.334c1.656 0 3-1.344 3-3v-21.167h-24.334v21.167zm19.167-17.666c0-0.552 0.449-1 1-1 0.553 0 1 0.448 1 1v17.373c0 0.554-0.447 1-1 1-0.551 0-1-0.446-1-1v-17.373zm-5.332 0c0-0.552 0.447-1 1-1 0.551 0 1 0.448 1 1v17.373c0 0.554-0.449 1-1 1-0.553 0-1-0.446-1-1v-17.373zm-5.335 0c0-0.552 0.448-1 1-1s1 0.448 1 1v17.373c0 0.554-0.448 1-1 1s-1-0.446-1-1v-17.373zm-5.333 0c0-0.552 0.448-1 1-1s1 0.448 1 1v17.373c0 0.554-0.448 1-1 1s-1-0.446-1-1v-17.373z" fill="#fff"/>\n</g>\n</svg> Delete File</button>\n                              </div> \n                              <div class=\'col-md-1 mt-2\'>\n                                <button data-filename=\'' + i + '\' style=\'float: right;\' class=\'btn btn-success btn-sm\' href=\'#\'><svg fill="#FFF" width="30" enable-background="new 0 0 50.993 50.993" version="1.1" viewBox="0 0 50.993 50.993" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"><path d="m35.453 31.141-0.012-2e-3v-0.023l-0.03 0.016-10.996-2.352-7.998 4.23 0.07 0.134-0.08-0.017v13.021l10.774 2.543 8.28-4.558-0.02-12.713 0.012-0.279zm-8.813 16.776-9.66-2.224v-11.857l9.66 2.08v12.001z"/>\n        <polygon points="38.391 6.434 33.359 2.301 12.601 2.301 12.601 8.848 38.391 8.848"/>\n        <path d="m48.393 10.506h-45.795c-1.434 0-2.598 1.166-2.598 2.6v18.948c0 1.435 1.164 2.603 2.598 2.603h12.753v-1.17l-0.198-0.38h-0.613l2e-3 -7.464h22.5v7.461h-0.556l3e-3 1.553h11.903c1.433 0 2.601-1.168 2.601-2.604v-18.947c-3e-3 -1.435-1.169-2.6-2.6-2.6zm-32.336 6.162h-11.088v-1.475h11.088v1.475zm28.209 1.789c-1.391 0-2.522-1.133-2.522-2.526s1.133-2.525 2.522-2.525c1.396 0 2.527 1.132 2.527 2.525s-1.133 2.526-2.527 2.526z"/></svg> Print File</button>\n                              </div> \n                              <div class=\'col-md-1 mt-2\'>\n                              </div>\n\n                    ')
+                            }
+                    })
+                }, 2500), setTimeout(function() {
+                    $("#nozzle").inputSpinner(), $("#table").inputSpinner();
+                    for (var t = $(".col-md-4").length, n = 0; n < t; n++) $(".col-md-4:eq(" + n + ")").css("width", "30%");
+                    for (t = $(".input-group").length, n = 0; n < t; n++) {
+                        $(".input-group:eq(" + n + ") input").css("width", "40%");
+                        for (var e = document.querySelectorAll(".input-group")[n].children.length, o = 0; o < e; o++) document.querySelectorAll(".input-group")[n].children[o].style.float = "left"
+                    }
+                    $(".stats img:eq(0)").css("width", "12%"), $(".stats img:eq(1)").css("width", "15%")
+                }, 3e3), $(".input-group:eq(0) button:eq(0), .input-group:eq(0) button:eq(1)").click(function() {
+                    var t = "M104 $" + $(".input-group:eq(0) input").val();
+                    console.log(t), $.get("sendCommand?cmd=" + t, function(t, n) {})
+                }), $(".input-group:eq(1) button:eq(0), .input-group:eq(1) button:eq(1)").click(function() {
+                    var t = "M140 $" + $(".input-group:eq(1) input").val();
+                    console.log(t), $.get("sendCommand?cmd=" + t, function(t, n) {})
+                }), $(".path").mousedown(function() {
+                    $(this).css("fill", "#CCC"), console.log($(this).data("direction"));
+                    var t = "";
+                    "up" == $(this).data("direction") && (t = "G1 Y10"), "down" == $(this).data("direction") && (t = "G1 Y-10"), "left" == $(this).data("direction") && (t = "G1 X-100"), "right" == $(this).data("direction") && (t = "G1 X100"), "zup" == $(this).data("direction") && (t = "G1 Z10"), "zdown" == $(this).data("direction") && (t = "G1 Z-10"), "eup" == $(this).data("direction") && (t = "G1 E10"), "edown" == $(this).data("direction") && (t = "G1 E-10"), "motoroff" == $(this).data("direction") && (t = "M84"), "xhome" == $(this).data("direction") && (t = "G28 X"), "yhome" == $(this).data("direction") && (t = "G28 Y"), "zhome" == $(this).data("direction") && (t = "G28 Z"), "emergencystop" == $(this).data("direction") && (t = "M112"), console.log(t), $.get("sendCommand?cmd=" + t, function(t, n) {
+                        console.log(t)
+                    })
+                }), $(".path").mouseup(function() {
+                    $(this).css("fill", "#000")
+                }), $.get("getssid", function(t, n) {
+                    $("#getssid").html(t)
+                }), $.get("getrssi", function(t, n) {
+                    $("#getrssi").html(t)
+                }), $.get("getlocalip", function(t, n) {
+                    $("#getlocalip").html(t)
+                }), $.get("gettotalspace", function(t, n) {
+                    $("#gettotalspace").html(t)
+                }), setTimeout(function() {
+                    $(".btn-danger").click(function() {
+                        var t = $(this).data("filename");
+                        console.log(t), $.get("file_delete?fileName=" + t, function(t, n) {
+                            "1" == t && location.reload()
+                        })
+                    }), $(".btn-success").click(function() {
+                        var t = $(this).data("filename");
+                        console.log(t), $.get("file_read?fileName=" + t, function(t, n) {
+                            console.log(t)
+                        })
+                    })
+                }, 2e3)
+            });
+        </script>
+</body>
+
+</html>
