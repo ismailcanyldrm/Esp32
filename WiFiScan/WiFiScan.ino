@@ -45,7 +45,7 @@ void setup(){
     Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
     
     
-    clearEEPROM();
+    //clearEEPROM();
     
     SPIFFS.begin();
     
@@ -65,30 +65,36 @@ void setup(){
     
     //savedSSID = file2.read(); //readStringEEPROM(EEPROM_SSID);
     myFile.close();
+    Serial2.print("savedSSID:");
+    Serial2.println(savedSSID);
     Serial.print("savedSSID:");
     Serial.println(savedSSID);
     savedSSID.trim();
     if(savedSSID==""){
       networks = scanNetwork();
+      Serial2.println(networks);
       Serial.println(networks);
       while(true){
-        if(Serial.available() > 0){
+        if(Serial2.available() > 0){
           String incomingString = Serial.readString();
           incomingString.trim();
           line = getValue(networks, '\n', (incomingString.toInt()-1));
           ssid = midString(line, ": ", " (");
           if(ssid!=""){
+            Serial2.print("Input password for network ");
+            Serial2.print(ssid);
+            Serial2.println(":");
             Serial.print("Input password for network ");
             Serial.print(ssid);
             Serial.println(":");
             while(true){
-              if(Serial.available() > 0){
+              if(Serial2.available() > 0){
                   String incomingString = Serial.readString();
                   incomingString.trim();
-                  Serial.println(incomingString);
+                  Serial2.println(incomingString);
                   String conn = wifiConnect((char *) ssid.c_str(), (char *) incomingString.c_str());
                   if(conn=="1"){
-                    Serial.println("Connected");
+                    Serial2.println("Connected");
                     //writeStringEEPROM(EEPROM_SSID, ssid+"|"+incomingString);
                     File configfile = SPIFFS.open("/config.txt", FILE_WRITE);
                     if(configfile.print(ssid+"|"+incomingString)) {
@@ -97,11 +103,11 @@ void setup(){
                         Serial.println("File write failed");
                     }
                     configfile.close();
-                    Serial.println(WiFi.localIP());
+                    Serial2.println(WiFi.localIP());
                     delay(1000);
                     ESP.restart(); 
                   }else{
-                    Serial.println("WiFi Password is incorrect!");
+                    Serial2.println("WiFi Password is incorrect!");
                   }
               }
             }
@@ -116,7 +122,7 @@ void setup(){
       String password = getValue(savedSSID, '|', 1);
       String conn = wifiConnect((char *) ssid.c_str(), (char *) password.c_str());
       if(conn=="1"){
-        Serial.println(WiFi.localIP());
+        Serial2.println(WiFi.localIP());
         if(!SD.begin(5)){
           Serial.println("Card Mount Failed");
           return;
