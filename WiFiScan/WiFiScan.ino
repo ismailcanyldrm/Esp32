@@ -65,36 +65,31 @@ void setup(){
     
     //savedSSID = file2.read(); //readStringEEPROM(EEPROM_SSID);
     myFile.close();
-    Serial2.print("savedSSID:");
-    Serial2.println(savedSSID);
     Serial.print("savedSSID:");
     Serial.println(savedSSID);
     savedSSID.trim();
     if(savedSSID==""){
       networks = scanNetwork();
-      Serial2.println(networks);
       Serial.println(networks);
+      Serial2.println(networks);
       while(true){
         if(Serial2.available() > 0){
-          String incomingString = Serial.readString();
+          String incomingString = Serial2.readString();
           incomingString.trim();
           line = getValue(networks, '\n', (incomingString.toInt()-1));
           ssid = midString(line, ": ", " (");
           if(ssid!=""){
-            Serial2.print("Input password for network ");
-            Serial2.print(ssid);
-            Serial2.println(":");
             Serial.print("Input password for network ");
             Serial.print(ssid);
             Serial.println(":");
             while(true){
               if(Serial2.available() > 0){
-                  String incomingString = Serial.readString();
+                  String incomingString = Serial2.readString();
                   incomingString.trim();
                   Serial2.println(incomingString);
                   String conn = wifiConnect((char *) ssid.c_str(), (char *) incomingString.c_str());
                   if(conn=="1"){
-                    Serial2.println("Connected");
+                    Serial.println("Connected");
                     //writeStringEEPROM(EEPROM_SSID, ssid+"|"+incomingString);
                     File configfile = SPIFFS.open("/config.txt", FILE_WRITE);
                     if(configfile.print(ssid+"|"+incomingString)) {
@@ -103,11 +98,11 @@ void setup(){
                         Serial.println("File write failed");
                     }
                     configfile.close();
-                    Serial2.println(WiFi.localIP());
+                    Serial.println(WiFi.localIP());
                     delay(1000);
                     ESP.restart(); 
                   }else{
-                    Serial2.println("WiFi Password is incorrect!");
+                    Serial.println("WiFi Password is incorrect!");
                   }
               }
             }
@@ -629,6 +624,7 @@ String scanNetwork(){
         Serial.println(" networks found");
         for (int i = 0; i < n; ++i) {
             // Print SSID and RSSI for each network found
+            returnvalue += "M118 ";
             returnvalue += String(i + 1);
             returnvalue += ": ";
             returnvalue += WiFi.SSID(i);
