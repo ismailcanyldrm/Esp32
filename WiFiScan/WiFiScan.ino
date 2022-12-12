@@ -118,20 +118,22 @@ void setup(){
       String conn = wifiConnect((char *) ssid.c_str(), (char *) password.c_str());
       if(conn=="1"){
         Serial2.println(WiFi.localIP());
+        Serial.println(WiFi.localIP());
+        
         if(!SD.begin(5)){
           Serial.println("Card Mount Failed");
-          return;
+          //return;
         }else{
           Serial.println("Card Mounted");
         }
         uint8_t cardType = SD.cardType();
-      
+      /*
         if(cardType == CARD_NONE){
           Serial.println("No SD card attached");
           return;
         }else{
           Serial.println("SD card attached");
-        }
+        }*/
         
         server.on("/", handle_OnConnect);
         
@@ -161,7 +163,7 @@ void setup(){
             }
           } 
           if(upload.status == UPLOAD_FILE_WRITE){
-            Serial2.println("M84");
+            Serial2.println("M22");
             Serial.println("STM32 Yeniden başlatıldı");
             delay(100);
             
@@ -597,7 +599,7 @@ String wifiConnect(char* ssid, char* password){
     }
 
     if(WiFi.status() == WL_CONNECTED){
-      Serial2.println("M1234");
+      Serial2.println("M22");
       Serial.println("STM32 Yeniden Başlatıldı");
       delay(100);
       conn = "1"; 
