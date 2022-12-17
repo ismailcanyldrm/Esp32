@@ -3,6 +3,7 @@
  *  The API is almost the same as with the WiFi Shield library,
  *  the most obvious difference being the different file you need to include:
  */
+
 #define RXD2 16
 #define TXD2 17
 
@@ -39,15 +40,15 @@ bool opened = false;
 File root, file;
 
 void setup(){
-
     Serial.begin(115200);
     EEPROM.begin(EEPROM_SIZE);
     Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
-    
-    
+
     //clearEEPROM();
     
     SPIFFS.begin();
+    
+
     
     // Set WiFi to station mode and disconnect from an AP if it was previously connected
     WiFi.mode(WIFI_STA);
@@ -117,6 +118,8 @@ void setup(){
       String password = getValue(savedSSID, '|', 1);
       String conn = wifiConnect((char *) ssid.c_str(), (char *) password.c_str());
       if(conn=="1"){
+        Serial2.println("M118 A");
+        Serial2.print("M118 ");
         Serial2.println(WiFi.localIP());
         Serial.println(WiFi.localIP());
         
@@ -127,13 +130,13 @@ void setup(){
           Serial.println("Card Mounted");
         }
         uint8_t cardType = SD.cardType();
-      /*
+      
         if(cardType == CARD_NONE){
           Serial.println("No SD card attached");
-          return;
+          //return;
         }else{
           Serial.println("SD card attached");
-        }*/
+        }
         
         server.on("/", handle_OnConnect);
         
@@ -163,16 +166,14 @@ void setup(){
             }
           } 
           if(upload.status == UPLOAD_FILE_WRITE){
-            Serial2.println("M22");
-            Serial.println("STM32 Yeniden başlatıldı");
-            delay(100);
+            //Serial2.println("M22");
+            //Serial.println("STM32 Yeniden başlatıldı");
             
             if(root.write(upload.buf, upload.currentSize) != upload.currentSize){
               Serial.println("- failed to write");
               return;
             }
           } else if(upload.status == UPLOAD_FILE_END){
-            
             root.close();
             Serial.println("UPLOAD_FILE_END");
             opened = false;
@@ -188,7 +189,7 @@ void setup(){
             WebString += "Content-Type: image/png\r\n";
             WebString += "Content-Length: " + String(filesize) + "\r\n";
             WebString += "\r\n";
-            server.sendContent(WebString);
+            //server.sendContent(WebString);
             server.send(200, "image/png", WebString);
             
             char buf[1024];
@@ -196,7 +197,7 @@ void setup(){
             while(siz > 0) {
               size_t len = std::min((int)(sizeof(buf) - 1), siz);
               f.read((uint8_t *)buf, len);
-              server.client().write((const char*)buf, len);
+              //server.client().write((const char*)buf, len);
               server.sendContent((const char*)buf);
               siz -= len; 
               f.close();
@@ -212,7 +213,7 @@ void setup(){
             WebString += "Content-Type: image/png\r\n";
             WebString += "Content-Length: " + String(filesize) + "\r\n";
             WebString += "\r\n";
-            server.sendContent(WebString);
+            //server.sendContent(WebString);
             server.send(200, "image/png", WebString);
             
             char buf[1024];
@@ -220,7 +221,7 @@ void setup(){
             while(siz > 0) {
               size_t len = std::min((int)(sizeof(buf) - 1), siz);
               f.read((uint8_t *)buf, len);
-              server.client().write((const char*)buf, len);
+              //server.client().write((const char*)buf, len);
               server.sendContent((const char*)buf);
               siz -= len; 
               f.close();
@@ -236,7 +237,7 @@ void setup(){
             WebString += "Content-Type: image/png\r\n";
             WebString += "Content-Length: " + String(filesize) + "\r\n";
             WebString += "\r\n";
-            server.sendContent(WebString);
+            //server.sendContent(WebString);
             server.send(200, "image/png", WebString);
             
             char buf[1024];
@@ -244,7 +245,7 @@ void setup(){
             while(siz > 0) {
               size_t len = std::min((int)(sizeof(buf) - 1), siz);
               f.read((uint8_t *)buf, len);
-              server.client().write((const char*)buf, len);
+              //server.client().write((const char*)buf, len);
               server.sendContent((const char*)buf);
               siz -= len; 
               f.close();
@@ -260,7 +261,7 @@ void setup(){
             WebString += "Content-Type: image/png\r\n";
             WebString += "Content-Length: " + String(filesize) + "\r\n";
             WebString += "\r\n";
-            server.sendContent(WebString);
+            //server.sendContent(WebString);
             server.send(200, "image/png", WebString);
             
             char buf[1024];
@@ -268,7 +269,7 @@ void setup(){
             while(siz > 0) {
               size_t len = std::min((int)(sizeof(buf) - 1), siz);
               f.read((uint8_t *)buf, len);
-              server.client().write((const char*)buf, len);
+              //server.client().write((const char*)buf, len);
               server.sendContent((const char*)buf);
               siz -= len; 
               f.close();
@@ -284,7 +285,7 @@ void setup(){
             WebString += "Content-Type: image/png\r\n";
             WebString += "Content-Length: " + String(filesize) + "\r\n";
             WebString += "\r\n";
-            server.sendContent(WebString);
+            //server.sendContent(WebString);
             server.send(200, "image/png", WebString);
             
             char buf[1024];
@@ -292,7 +293,7 @@ void setup(){
             while(siz > 0) {
               size_t len = std::min((int)(sizeof(buf) - 1), siz);
               f.read((uint8_t *)buf, len);
-              server.client().write((const char*)buf, len);
+              //server.client().write((const char*)buf, len);
               server.sendContent((const char*)buf);
               siz -= len; 
               f.close();
@@ -308,7 +309,7 @@ void setup(){
             WebString += "Content-Type: image/png\r\n";
             WebString += "Content-Length: " + String(filesize) + "\r\n";
             WebString += "\r\n";
-            server.sendContent(WebString);
+            //server.sendContent(WebString);
             server.send(200, "image/png", WebString);
             
             char buf[1024];
@@ -316,7 +317,7 @@ void setup(){
             while(siz > 0) {
               size_t len = std::min((int)(sizeof(buf) - 1), siz);
               f.read((uint8_t *)buf, len);
-              server.client().write((const char*)buf, len);
+              //server.client().write((const char*)buf, len);
               server.sendContent((const char*)buf);
               siz -= len; 
               f.close();
@@ -332,7 +333,7 @@ void setup(){
             WebString += "Content-Type: image/png\r\n";
             WebString += "Content-Length: " + String(filesize) + "\r\n";
             WebString += "\r\n";
-            server.sendContent(WebString);
+            //server.sendContent(WebString);
             server.send(200, "image/png", WebString);
             
             char buf[1024];
@@ -340,37 +341,13 @@ void setup(){
             while(siz > 0) {
               size_t len = std::min((int)(sizeof(buf) - 1), siz);
               f.read((uint8_t *)buf, len);
-              server.client().write((const char*)buf, len);
+              //server.client().write((const char*)buf, len);
               server.sendContent((const char*)buf);
               siz -= len; 
               f.close();
             } 
       });
-/////////////////////////////////////////////////////////////////////////////////
-            server.on("/sd.png", []() {
-            File f = SPIFFS.open("/img/sd.png", "r");
-            server.streamFile(f, "image/png");
-            int filesize = f.size();
-            String WebString = "";
-            WebString += "HTTP/1.1 200 OK\r\n";
-            WebString += "Content-Type: image/sd\r\n";
-            WebString += "Content-Length: " + String(filesize) + "\r\n";
-            WebString += "\r\n";
-            server.sendContent(WebString);
-            server.send(200, "image/png", WebString);
-            
-            char buf[1024];
-            int siz = f.size();
-            while(siz > 0) {
-              size_t len = std::min((int)(sizeof(buf) - 1), siz);
-              f.read((uint8_t *)buf, len);
-              server.client().write((const char*)buf, len);
-              server.sendContent((const char*)buf);
-              siz -= len; 
-              f.close();
-            } 
-      });
-/////////////////////////////////////////////////////////////////////////////////////////////////
+
       
 
       server.on("/bootstrap-input-spinner.js", []() {
@@ -382,7 +359,7 @@ void setup(){
             WebString += "Content-Type: text/javascript\r\n";
             WebString += "Content-Length: " + String(filesize) + "\r\n";
             WebString += "\r\n";
-            server.sendContent(WebString);
+            //server.sendContent(WebString);
             server.send(200, "text/javascript", WebString);
             
             char buf[1024];
@@ -390,7 +367,7 @@ void setup(){
             while(siz > 0) {
               size_t len = std::min((int)(sizeof(buf) - 1), siz);
               f.read((uint8_t *)buf, len);
-              server.client().write((const char*)buf, len);
+              //server.client().write((const char*)buf, len);
               server.sendContent((const char*)buf);
               siz -= len; 
               f.close();
@@ -406,7 +383,7 @@ void setup(){
             WebString += "Content-Type: text/javascript\r\n";
             WebString += "Content-Length: " + String(filesize) + "\r\n";
             WebString += "\r\n";
-            server.sendContent(WebString);
+            //server.sendContent(WebString);
             server.send(200, "text/javascript", WebString);
             
             char buf[1024];
@@ -414,7 +391,7 @@ void setup(){
             while(siz > 0) {
               size_t len = std::min((int)(sizeof(buf) - 1), siz);
               f.read((uint8_t *)buf, len);
-              server.client().write((const char*)buf, len);
+              //server.client().write((const char*)buf, len);
               server.sendContent((const char*)buf);
               siz -= len; 
               f.close();
@@ -547,8 +524,6 @@ String readStringEEPROM(char add)
     return String(data);
 }
 
-
-
 void loop()
 {
     if (Serial.available() > 0) {
@@ -567,19 +542,20 @@ void loop()
       
     }
   server.handleClient();
+  menu();
   
   //delay(100);
     
 }
 
-/*String menu(){
+String menu(){
   String menu = "";
   menu += "1. Show Wifi networks\n";
   menu += "2. Show IP address\n";
   menu += "3. WebServer address\n";
   menu += "4. Disconnect from connected network\n";
   return menu;
-}*/
+}
 
 String wifiConnect(char* ssid, char* password){
     String conn = "";
@@ -601,7 +577,6 @@ String wifiConnect(char* ssid, char* password){
     if(WiFi.status() == WL_CONNECTED){
       Serial2.println("M22");
       Serial.println("STM32 Yeniden Başlatıldı");
-      delay(100);
       conn = "1"; 
     }else{
       conn = "0";
@@ -613,7 +588,7 @@ String wifiConnect(char* ssid, char* password){
 
 
 String scanNetwork(){
-  Serial.println("Setup done");
+    Serial2.println("M118 C");
     Serial.println("scan start");
     String returnvalue = "";
     // WiFi.scanNetworks will return the number of networks found
@@ -636,6 +611,7 @@ String scanNetwork(){
             returnvalue += (WiFi.encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*\n";
             delay(10);
         }
+        //returnvalue += "M118 C\n";
     }
     returnvalue += "Input SSID number to choose:";
     return returnvalue;
@@ -760,6 +736,7 @@ String readFile(fs::FS &fs, const char * path){
 void writeFile(fs::FS &fs, const char * path, const char * message){
   Serial.printf("Writing file: %s\n", path);
 
+
   File file = fs.open(path, FILE_WRITE);
   if(!file){
     Serial.println("Failed to open file for writing");
@@ -859,7 +836,7 @@ String genString(uint64_t input) {
     char c = input % base;
     input /= base;
 
-    if (c < 1000)
+    if (c < 10)
       c +='0';
     else
       c += 'A' - 10;
