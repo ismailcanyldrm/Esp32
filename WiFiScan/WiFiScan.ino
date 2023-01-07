@@ -528,12 +528,11 @@ void loop()
 {
     if (Serial.available() > 0) {
       // read the incoming string:
-      String incomingString = Serial.readString();
-      Serial.print(incomingString);
+      String incomingString = Serial2.readString();
       Serial2.print(incomingString);
       incomingString.trim();
       if(incomingString=="N" || incomingString=="n"){
-        Serial.println(scanNetwork());
+        Serial2.println(scanNetwork());
         while(true){
            if(incomingString=="M")
            delay(500);
@@ -542,7 +541,6 @@ void loop()
       
     }
   server.handleClient();
-  menu();
   
   //delay(100);
     
@@ -575,8 +573,6 @@ String wifiConnect(char* ssid, char* password){
     }
 
     if(WiFi.status() == WL_CONNECTED){
-      Serial2.println("M22");
-      Serial.println("STM32 Yeniden Başlatıldı");
       conn = "1"; 
     }else{
       conn = "0";
@@ -588,7 +584,7 @@ String wifiConnect(char* ssid, char* password){
 
 
 String scanNetwork(){
-    Serial2.println("M118 C");
+    Serial2.println("");
     Serial.println("scan start");
     String returnvalue = "";
     // WiFi.scanNetworks will return the number of networks found
@@ -599,6 +595,7 @@ String scanNetwork(){
     } else {
         Serial.print(n);
         Serial.println(" networks found");
+        Serial2.println("M118 C");
         for (int i = 0; i < n; ++i) {
             // Print SSID and RSSI for each network found
             returnvalue += "M118 ";
@@ -613,7 +610,7 @@ String scanNetwork(){
         }
         //returnvalue += "M118 C\n";
     }
-    returnvalue += "Input SSID number to choose:";
+    returnvalue += "";
     return returnvalue;
 }
 
