@@ -3,15 +3,11 @@
  *  The API is almost the same as with the WiFi Shield library,
  *  the most obvious difference being the different file you need to include:
  */
-
-#define RXD2 16
-#define TXD2 17
-
+#include "esp_camera.h" //kamera
 #include <FS.h>
-#include <SD.h>
+#include <SD_MMC.h>
 #include <SPI.h>
 #include <SPIFFS.h>
-
 #include <WebServer.h>
 WebServer server(80);
 
@@ -22,7 +18,13 @@ WebServer server(80);
 
 String value;
 String networks, line, ssid;
-
+#define CAMERA_MODEL_AI_THINKER // Has PSRAM
+#define SD_CMD 15
+#define SD_CLK 14
+#define SD_DATA0 2
+#define SD_DATA1 4
+#define SD_DATA2 12
+#define SD_DATA3 13
 #define EEPROM_SIZE 200
 #define EEPROM_SSID 0
 #define EEPROM_PASS 100
@@ -31,7 +33,7 @@ String networks, line, ssid;
 String savedSSID = "";
 String savedPASS = "";
 String message = "";
-
+#include "camera_pins.h"
 
 char ssidA[100];
 char passA[100];
@@ -41,9 +43,9 @@ File root, file;
 
 void setup(){
     Serial.begin(115200);
+    Serial.setDebugOutput(true);
     EEPROM.begin(EEPROM_SIZE);
-    Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
-
+    void startCameraServer();
     //clearEEPROM();
     
     SPIFFS.begin();
@@ -72,10 +74,10 @@ void setup(){
     if(savedSSID==""){
       networks = scanNetwork();
       Serial.println(networks);
-      Serial2.println(networks);
+      Serial.println(networks);
       while(true){
-        if(Serial2.available() > 0){
-          String incomingString = Serial2.readString();
+        if(Serial.available() > 0){
+          String incomingString = Serial.readString();
           incomingString.trim();
           line = getValue(networks, '\n', (incomingString.toInt()-1));
           ssid = midString(line, ": ", " (");
@@ -84,10 +86,10 @@ void setup(){
             Serial.print(ssid);
             Serial.println(":");
             while(true){
-              if(Serial2.available() > 0){
-                  String incomingString = Serial2.readString();
+              if(Serial.available() > 0){
+                  String incomingString = Serial.readString();
                   incomingString.trim();
-                  Serial2.println(incomingString);
+                  Serial.println(incomingString);
                   String conn = wifiConnect((char *) ssid.c_str(), (char *) incomingString.c_str());
                   if(conn=="1"){
                     Serial.println("Connected");
@@ -118,26 +120,121 @@ void setup(){
       String password = getValue(savedSSID, '|', 1);
       String conn = wifiConnect((char *) ssid.c_str(), (char *) password.c_str());
       if(conn=="1"){
-        Serial2.println("M118 A");
-        Serial2.print("M118 ");
-        Serial2.println(WiFi.localIP());
+        Serial.println("M118 A");
+        Serial.print("M118 ");
         Serial.println(WiFi.localIP());
+        Serial.println(WiFi.localIP());
+        //////////////////////////////////////////////////////////////////////////
+        camera_config_t config;
+        config.ledc_channel = LEDC_CHANNEL_0;
+        config.ledc_timer = LEDC_TIMER_0;
+        config.pin_d0 = Y2_GPIO_NUM;
+        config.pin_d1 = Y3_GPIO_NUM;
+        config.pin_d2 = Y4_GPIO_NUM;
+        config.pin_d3 = Y5_GPIO_NUM;
+        config.pin_d4 = Y6_GPIO_NUM;
+        config.pin_d5 = Y7_GPIO_NUM;
+        config.pin_d6 = Y8_GPIO_NUM;
+        config.pin_d7 = Y9_GPIO_NUM;
+        config.pin_xclk = XCLK_GPIO_NUM;
+        config.pin_pclk = PCLK_GPIO_NUM;
+        config.pin_vsync = VSYNC_GPIO_NUM;
+        config.pin_href = HREF_GPIO_NUM;
+        config.pin_sscb_sda = SIOD_GPIO_NUM;
+        config.pin_sscb_scl = SIOC_GPIO_NUM;
+        config.pin_pwdn = PWDN_GPIO_NUM;
+        config.pin_reset = RESET_GPIO_NUM;
+        config.xclk_freq_hz = 20000000;
+        config.frame_size = FRAMESIZE_UXGA;
+        config.pixel_format = PIXFORMAT_JPEG; // for streaming
+        //config.pixel_format = PIXFORMAT_RGB565; // for face detection/recognition
+        config.grab_mode = CAMERA_GRAB_WHEN_EMPTY;
+        config.fb_location = CAMERA_FB_IN_PSRAM;
+        config.jpeg_quality = 12;
+        config.fb_count = 1;
         
-        if(!SD.begin(5)){
+        // if PSRAM IC present, init with UXGA resolution and higher JPEG quality
+        //                      for larger pre-allocated frame buffer.
+        if(config.pixel_format == PIXFORMAT_JPEG){
+          if(psramFound()){
+            config.jpeg_quality = 10;
+            config.fb_count = 2;
+            config.grab_mode = CAMERA_GRAB_LATEST;
+          } else {
+            // Limit the frame size when PSRAM is not available
+            config.frame_size = FRAMESIZE_SVGA;
+            config.fb_location = CAMERA_FB_IN_DRAM;
+          }
+        } else {
+          // Best option for face detection/recognition
+          config.frame_size = FRAMESIZE_240X240;
+      #if CONFIG_IDF_TARGET_ESP32S3
+          config.fb_count = 2;
+      #endif
+        }
+
+      #if defined(CAMERA_MODEL_ESP_EYE)
+        pinMode(13, INPUT_PULLUP);
+        pinMode(14, INPUT_PULLUP);
+      #endif
+
+        // camera init
+        esp_err_t err = esp_camera_init(&config);
+        if (err != ESP_OK) {
+          Serial.printf("Camera init failed with error 0x%x", err);
+          return;
+        }
+
+        sensor_t * s = esp_camera_sensor_get();
+        // initial sensors are flipped vertically and colors are a bit saturated
+        if (s->id.PID == OV3660_PID) {
+          s->set_vflip(s, 1); // flip it back
+          s->set_brightness(s, 1); // up the brightness just a bit
+          s->set_saturation(s, -2); // lower the saturation
+        }
+        // drop down frame size for higher initial frame rate
+        if(config.pixel_format == PIXFORMAT_JPEG){
+          s->set_framesize(s, FRAMESIZE_QVGA);
+        }
+
+      #if defined(CAMERA_MODEL_M5STACK_WIDE) || defined(CAMERA_MODEL_M5STACK_ESP32CAM)
+        s->set_vflip(s, 1);
+        s->set_hmirror(s, 1);
+      #endif
+
+      #if defined(CAMERA_MODEL_ESP32S3_EYE)
+        s->set_vflip(s, 1);
+      #endif
+        WiFi.setSleep(false);
+
+        while (WiFi.status() != WL_CONNECTED) {
+          delay(500);
+          Serial.print(".");
+        }
+        Serial.println("");
+        Serial.println("WiFi connected");
+
+        startCameraServer();
+
+        Serial.print("Camera Ready! Use 'http://");
+        Serial.print(WiFi.localIP());
+        Serial.println("' to connect");
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if(!SD_MMC.begin()){
           Serial.println("Card Mount Failed");
           //return;
         }else{
           Serial.println("Card Mounted");
         }
-        uint8_t cardType = SD.cardType();
+        uint8_t cardType = SD_MMC.cardType();
       
         if(cardType == CARD_NONE){
+        //if(cardType == CARD_SDHC){
           Serial.println("No SD card attached");
           //return;
         }else{
           Serial.println("SD card attached");
         }
-        
         server.on("/", handle_OnConnect);
         
 
@@ -159,14 +256,14 @@ void setup(){
           HTTPUpload& upload = server.upload();
           if(opened == false){
             opened = true;
-            root = SD.open((String("/") + upload.filename).c_str(), FILE_WRITE);  
+            root = SD_MMC.open((String("/") + upload.filename).c_str(), FILE_WRITE);  
             if(!root){
               Serial.println("- failed to open file for writing");
               return;
             }
           } 
           if(upload.status == UPLOAD_FILE_WRITE){
-            //Serial2.println("M22");
+            //Serial.println("M22");
             //Serial.println("STM32 Yeniden başlatıldı");
             
             if(root.write(upload.buf, upload.currentSize) != upload.currentSize){
@@ -410,7 +507,6 @@ void sendCommand()
 {
  String cmd = server.arg("cmd");
  Serial.println(cmd);
- Serial2.println(cmd);
  server.send(200, "text/plain", "1");
 }
 
@@ -419,8 +515,7 @@ void file_delete()
  
  String act_state = server.arg("fileName");
  Serial.println(act_state);
- Serial2.println(act_state);
- deleteFile(SD, server.arg("fileName").c_str());
+ deleteFile(SD_MMC, server.arg("fileName").c_str());
  server.send(200, "text/plain", "1");
 }
 
@@ -428,8 +523,7 @@ void file_read()
 {
    String act_state = server.arg("fileName");
    Serial.println(act_state);
-   Serial2.println(act_state);
-   String result = readFile(SD, server.arg("fileName").c_str());
+   String result = readFile(SD_MMC, server.arg("fileName").c_str());
    server.send(200, "text/plain", result);
 }
 
@@ -446,7 +540,7 @@ void getlocalIP(){
 }
 
 void getTotalSpace(){
-  uint64_t cardSize = SD.cardSize() / (1024 * 1024);
+  uint64_t cardSize = SD_MMC.cardSize() / (1024 * 1024);
   server.send(200, "text/plain", genString(cardSize));
 }
 
@@ -465,7 +559,7 @@ void handle_OnConnect() {
 }
 
 void directoryList() {
-  server.send(200, "text/html", listDir(SD, "/", 0));   
+  server.send(200, "text/html", listDir(SD_MMC, "/", 0));   
 }
 
 
@@ -528,11 +622,11 @@ void loop()
 {
     if (Serial.available() > 0) {
       // read the incoming string:
-      String incomingString = Serial2.readString();
-      Serial2.print(incomingString);
+      String incomingString = Serial.readString();
+      Serial.print(incomingString);
       incomingString.trim();
       if(incomingString=="N" || incomingString=="n"){
-        Serial2.println(scanNetwork());
+        Serial.println(scanNetwork());
         while(true){
            if(incomingString=="M")
            delay(500);
@@ -584,7 +678,7 @@ String wifiConnect(char* ssid, char* password){
 
 
 String scanNetwork(){
-    Serial2.println("");
+    Serial.println("");
     Serial.println("scan start");
     String returnvalue = "";
     // WiFi.scanNetworks will return the number of networks found
@@ -595,7 +689,7 @@ String scanNetwork(){
     } else {
         Serial.print(n);
         Serial.println(" networks found");
-        Serial2.println("M118 C");
+        Serial.println("M118 C");
         for (int i = 0; i < n; ++i) {
             // Print SSID and RSSI for each network found
             returnvalue += "M118 ";
